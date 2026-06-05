@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../../../context/AuthContext';
 import { 
   Calendar, LayoutDashboard, Users, Clock, MapPin, 
-  FileText, Palmtree, Settings, LogOut, Menu, X, User 
+  FileText, Palmtree, Settings, LogOut, Menu, X, User, Navigation, ShieldCheck
 } from 'lucide-react';
 
 function RRHHLayout({ children }) {
@@ -23,9 +23,11 @@ function RRHHLayout({ children }) {
     { name: 'Calendario Híbrido', path: '/rrhh/calendario', icon: Calendar, status: 'active' },
     { name: 'Reglas de Horario', path: '/rrhh/horarios', icon: Clock, status: 'active' },
     { name: 'Geocercas', path: '/rrhh/geocercas', icon: MapPin, status: 'active' },
+    { name: 'Monitoreo GPS', path: '/rrhh/monitoreo', icon: Navigation, status: 'active' },
     { name: 'Justificaciones', path: '/rrhh/justificaciones', icon: FileText, status: 'active' },
     { name: 'Vacaciones', path: '/rrhh/vacaciones', icon: Palmtree, status: 'active' },
     { name: 'Pre-nómina', path: '/rrhh/prenomina', icon: Settings, status: 'active' },
+    { name: 'Auditoría', path: '/rrhh/auditoria', icon: ShieldCheck, status: 'active' },
   ];
 
   const userSession = user || { sub: 'rrhh@empresa.com', context: { nombre_completo: 'Admin de RRHH' } };

@@ -25,7 +25,8 @@ function VacacionesPage() {
     handleRejectVacacion,
     handleCreateVacacion,
     openFormModal,
-    closeFormModal
+    closeFormModal,
+    refetchBalance
   } = useVacaciones();
 
   return (
@@ -87,6 +88,7 @@ function VacacionesPage() {
               onSelectedIdChange={setBalanceCheckEmployeeId}
               checkedBalance={checkedBalance}
               loadingBalance={loadingBalance}
+              onBalanceAdjusted={refetchBalance}
             />
           </div>
 

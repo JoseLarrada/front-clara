@@ -12,6 +12,14 @@ import JustificacionPage from './features/rrhh/justificaciones/pages/Justificaci
 import VacacionesPage from './features/rrhh/vacaciones/pages/VacacionesPage'
 import PrenominaPage from './features/rrhh/prenomina/pages/PrenominaPage'
 import CalendarioPage from './features/rrhh/calendario/pages/CalendarioPage'
+import EmpleadoDashboardPage from './features/empleado/pages/EmpleadoDashboardPage'
+import EmpleadoVacacionesPage from './features/empleado/pages/EmpleadoVacacionesPage'
+import EmpleadoHistorialPage from './features/empleado/pages/EmpleadoHistorialPage'
+import EmpleadoContratoPage from './features/empleado/pages/EmpleadoContratoPage'
+import EmpleadoNominasPage from './features/empleado/pages/EmpleadoNominasPage'
+import EmpleadoPerfilPage from './features/empleado/pages/EmpleadoPerfilPage'
+import TrackingMapPage from './features/rrhh/monitoreo/pages/TrackingMapPage'
+import AuditLogsPage from './features/rrhh/auditoria/pages/AuditLogsPage'
 
 function App() {
   return (
@@ -89,6 +97,70 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['ROLE_ADMIN_RRHH', 'ADMIN_RRHH']}>
                 <CalendarioPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/rrhh/monitoreo" 
+            element={
+              <ProtectedRoute allowedRoles={['ROLE_ADMIN_RRHH', 'ADMIN_RRHH']}>
+                <TrackingMapPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/rrhh/auditoria" 
+            element={
+              <ProtectedRoute allowedRoles={['ROLE_ADMIN_RRHH', 'ADMIN_RRHH']}>
+                <AuditLogsPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/empleado" 
+            element={
+              <ProtectedRoute allowedRoles={['EMPLEADO', 'ROLE_EMPLEADO']}>
+                <EmpleadoDashboardPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/empleado/vacaciones" 
+            element={
+              <ProtectedRoute allowedRoles={['EMPLEADO', 'ROLE_EMPLEADO']}>
+                <EmpleadoVacacionesPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/empleado/historial" 
+            element={
+              <ProtectedRoute allowedRoles={['EMPLEADO', 'ROLE_EMPLEADO']}>
+                <EmpleadoHistorialPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/empleado/contrato" 
+            element={
+              <ProtectedRoute allowedRoles={['EMPLEADO', 'ROLE_EMPLEADO']}>
+                <EmpleadoContratoPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/empleado/nominas" 
+            element={
+              <ProtectedRoute allowedRoles={['EMPLEADO', 'ROLE_EMPLEADO']}>
+                <EmpleadoNominasPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/empleado/perfil" 
+            element={
+              <ProtectedRoute allowedRoles={['EMPLEADO', 'ROLE_EMPLEADO']}>
+                <EmpleadoPerfilPage />
               </ProtectedRoute>
             } 
           />

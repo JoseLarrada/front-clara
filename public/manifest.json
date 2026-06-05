@@ -1,0 +1,24 @@
+{
+  "short_name": "Clara",
+  "name": "Clara - Control de Asistencia",
+  "description": "Portal de Autogestión de Asistencias, Contratos y Nóminas de Clara.",
+  "icons": [
+    {
+      "src": "logo_clara.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo_clara.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f2942",
+  "theme_color": "#0f2942",
+  "display": "standalone",
+  "orientation": "portrait"
+}

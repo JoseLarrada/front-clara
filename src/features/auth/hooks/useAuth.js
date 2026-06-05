@@ -30,6 +30,8 @@ export const useAuth = () => {
         navigate('/superadmin');
       } else if (roles.includes('ROLE_ADMIN_RRHH') || roles.includes('ADMIN_RRHH')) {
         navigate('/rrhh');
+      } else if (roles.includes('ROLE_EMPLEADO') || roles.includes('EMPLEADO')) {
+        navigate('/empleado');
       } else {
         // En un futuro redirigirá al panel de empleado. De momento al home con alerta.
         navigate('/');

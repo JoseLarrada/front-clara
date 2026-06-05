@@ -18,6 +18,7 @@ let mockHistoricalReports = [
     montoDeduccionesFaltas: 133333.33,
     montoNetoPagar: 1858333.34,
     estadoReporte: "BORRADOR",
+    requiereRecalculo: true, // Bandera de inconsistencia para pruebas
     generadoEl: "2026-05-28T04:37:00.000Z"
   }
 ];
@@ -219,6 +220,29 @@ export const getPrenominaReportById = async (id) => {
       const rep = mockHistoricalReports.find(r => r.id === id);
       if (!rep) throw new Error('Reporte no encontrado');
       return rep;
+    }
+    throw error;
+  }
+};
+
+export const recalcularPrenominaReport = async (id) => {
+  try {
+    const response = await api.post(`/api/v1/admin/reportes-prenomina/${id}/recalcular`);
+    return handleResponse(response);
+  } catch (error) {
+    if (!error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error')) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const report = mockHistoricalReports.find(r => r.id === id);
+          if (report) {
+            report.requiereRecalculo = false;
+            report.requiere_recalculo = false;
+            // Aumentar ligeramente el pago simulado para evidenciar que corrió el cálculo
+            report.montoNetoPagar = Number((report.montoNetoPagar * 1.05).toFixed(2));
+          }
+          resolve({ success: true, message: 'Reporte recalculado con éxito (Simulado)' });
+        }, 500);
+      });
     }
     throw error;
   }

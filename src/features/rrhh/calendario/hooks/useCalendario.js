@@ -142,24 +142,75 @@ export const useCalendario = () => {
     setActionLoading(true);
     setApiError('');
     try {
-      // Generar fechas en el rango
-      const start = new Date(formData.fechaInicio);
-      const end = new Date(formData.fechaFin);
-      const asignaciones = [];
+      const { fechaInicio, fechaFin, caracterDia, repeticion, diasSemana } = formData;
+
+      // Parse dates cleanly in local time
+      const start = new Date(fechaInicio + 'T00:00:00');
+      const end = new Date(fechaFin + 'T00:00:00');
+
+      const getMondayOf = (date) => {
+        const temp = new Date(date.getTime());
+        const day = temp.getDay();
+        const diff = temp.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(temp.setDate(diff));
+        monday.setHours(0, 0, 0, 0);
+        return monday;
+      };
+
+      const monStart = getMondayOf(start);
+      const fechasSeleccionadas = [];
+      const pad = (n) => String(n).padStart(2, '0');
 
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0];
-        asignaciones.push({
-          empleadoId: selectedEmpleadoId,
-          fecha: dateStr,
-          caracterDia: formData.caracterDia
-        });
+        const dayOfWeek = d.getDay(); // 0 = Dom, 1 = Lun, ..., 6 = Sab
+        const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+        let matches = false;
+
+        if (repeticion === 'NINGUNA' || repeticion === 'DIARIA') {
+          matches = true;
+        } else if (repeticion === 'LABORAL') {
+          matches = (dayOfWeek >= 1 && dayOfWeek <= 5);
+        } else if (repeticion === 'FIN_SEMANA') {
+          matches = (dayOfWeek === 0 || dayOfWeek === 6);
+        } else if (repeticion === 'SEMANAL') {
+          matches = diasSemana.includes(dayOfWeek);
+        } else if (repeticion === 'CADA_DOS_SEMANAS') {
+          const monCurrent = getMondayOf(d);
+          const weeksDiff = Math.round((monCurrent - monStart) / (7 * 24 * 60 * 60 * 1000));
+          if (weeksDiff % 2 === 0) {
+            matches = diasSemana.includes(dayOfWeek);
+          }
+        }
+
+        if (matches) {
+          fechasSeleccionadas.push(dateStr);
+        }
       }
 
-      await bulkSaveCalendar({
-        empleadoId: selectedEmpleadoId,
-        asignaciones
-      });
+      if (fechasSeleccionadas.length === 0) {
+        throw new Error('No hay fechas en el rango que coincidan con las reglas de repetición.');
+      }
+
+      if (caracterDia === 'SIN_ASIGNAR') {
+        // Encontrar asignaciones del empleado en el rango que coincidan con las fechas a limpiar
+        const toDelete = assignments.filter(asg => fechasSeleccionadas.includes(asg.fecha));
+        if (toDelete.length > 0) {
+          // Eliminar concurrente de asignaciones
+          await Promise.all(toDelete.map(asg => deleteDayAssignment(asg.id)));
+        }
+      } else {
+        const asignaciones = fechasSeleccionadas.map(fecha => ({
+          empleadoId: selectedEmpleadoId,
+          fecha,
+          caracterDia
+        }));
+
+        await bulkSaveCalendar({
+          empleadoId: selectedEmpleadoId,
+          asignaciones
+        });
+      }
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -168,7 +219,7 @@ export const useCalendario = () => {
       return true;
     } catch (err) {
       console.error('Error submitting bulk calendar:', err);
-      const msg = err.response?.data?.message || 'Error al guardar las asignaciones en lote.';
+      const msg = err.response?.data?.message || err.response?.data?.mensaje || err.message || 'Error al guardar las asignaciones en lote.';
       setApiError(msg);
       return false;
     } finally {

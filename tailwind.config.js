@@ -15,7 +15,11 @@ export default {
           gray: '#F2F2F2',
           navy: '#0F2942',
         }
-      }
+      },
+      fontFamily: {
+        heading: ['Fira Code', 'monospace'],
+        body: ['Fira Sans', 'sans-serif'],
+      },
     },
   },
   plugins: [],

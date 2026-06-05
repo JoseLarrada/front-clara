@@ -1,6 +1,6 @@
 import { 
   ArrowUpDown, ChevronLeft, ChevronRight, Edit3, Trash2, 
-  User, CheckCircle, XCircle, Search, Plus, UserPlus
+  User, CheckCircle, XCircle, Search, Plus, UserPlus, Briefcase
 } from 'lucide-react';
 
 function EmployeeList({
@@ -16,7 +16,8 @@ function EmployeeList({
   onToggleActive,
   onModalidadChange,
   onDelete,
-  onAddClick
+  onAddClick,
+  onManageContracts
 }) {
   const [sortField, sortDir] = sort.split(',');
 
@@ -186,6 +187,16 @@ function EmployeeList({
                   {/* Acciones */}
                   <td className="px-6 py-4 text-right">
                     <div className="inline-flex items-center gap-2">
+                      {/* Contratos */}
+                      <button
+                        type="button"
+                        onClick={() => onManageContracts(emp)}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-650 hover:text-purple-600 hover:border-purple-300 hover:bg-purple-50 transition cursor-pointer"
+                        title="Gestionar Contratación / Contratos"
+                      >
+                        <Briefcase className="h-4 w-4" />
+                      </button>
+
                       {/* Editar */}
                       <button
                         type="button"

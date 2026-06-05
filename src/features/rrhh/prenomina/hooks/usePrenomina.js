@@ -4,7 +4,8 @@ import {
   getPrenominaConsolidado,
   generatePrenomina,
   getPrenominaReports,
-  exportReport
+  exportReport,
+  recalcularPrenominaReport
 } from '../services/prenominaService';
 
 export const usePrenomina = () => {
@@ -15,9 +16,9 @@ export const usePrenomina = () => {
     const m = String(today.getMonth() + 1).padStart(2, '0');
     // Primer dia del mes
     const start = `${y}-${m}-01`;
-    // Ultimo dia del mes (o dia de hoy)
-    const lastDay = new Date(y, today.getMonth() + 1, 0).getDate();
-    const end = `${y}-${m}-${String(lastDay).padStart(2, '0')}`;
+    // Dia de hoy (para cumplir con la validacion de fecha pasada o presente del backend)
+    const d = String(today.getDate()).padStart(2, '0');
+    const end = `${y}-${m}-${d}`;
     return { start, end };
   };
 
@@ -104,6 +105,13 @@ export const usePrenomina = () => {
       setApiError('La fecha de fin debe ser posterior a la fecha de inicio.');
       return;
     }
+    
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    if (new Date(fechaFin) > today) {
+      setApiError('La fecha de fin no puede ser una fecha futura (debe ser pasada o presente).');
+      return;
+    }
 
     setLoading(true);
     setApiError('');
@@ -162,6 +170,25 @@ export const usePrenomina = () => {
     }
   };
 
+  const [recalculatingId, setRecalculatingId] = useState('');
+
+  const handleRecalculateReport = async (report) => {
+    setRecalculatingId(report.id);
+    setApiError('');
+    setSuccess(false);
+    try {
+      await recalcularPrenominaReport(report.id);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+      await fetchHistoricalReports();
+    } catch (err) {
+      console.error(err);
+      setApiError(err.response?.data?.message || 'Error al recalcular el reporte de pre-nómina.');
+    } finally {
+      setRecalculatingId('');
+    }
+  };
+
   return {
     fechaInicio,
     setFechaInicio,
@@ -184,6 +211,8 @@ export const usePrenomina = () => {
     handlePageChange,
     handleCalculate,
     handleExport,
-    refetchHistory: fetchHistoricalReports
+    refetchHistory: fetchHistoricalReports,
+    recalculatingId,
+    handleRecalculateReport
   };
 };

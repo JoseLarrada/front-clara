@@ -242,3 +242,83 @@ export const patchModalidad = async (id, modalidadPerfil) => {
     throw error;
   }
 };
+
+// --- EMPLOYEE PANEL PORTAL CALLS ---
+
+const mockGetMiContrato = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: "mi-contrato-id-12345",
+        empleadoId: "7ac159a4-28b9-4672-911e-b8d438fc7bff",
+        empleadoNombre: "Colaborador Autenticado",
+        salarioBaseMensual: 3200000,
+        tipoMoneda: "COP",
+        tipoContrato: "TERMINO_INDEFINIDO",
+        fechaIngreso: "2026-06-05",
+        fechaRetiro: null,
+        activo: true
+      });
+    }, 400);
+  });
+};
+
+const mockGetMisReportesPrenomina = (params) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const { page = 0, size = 10 } = params;
+      resolve({
+        content: [
+          {
+            id: "prenomina-autenticado-1",
+            empresaId: "empresa-12345",
+            empleadoId: "7ac159a4-28b9-4672-911e-b8d438fc7bff",
+            empleadoNombre: "Colaborador Autenticado",
+            mesPeriodo: 5,
+            anioPeriodo: 2026,
+            diasTrabajadosEfectivos: 22,
+            diasFaltaInjustificada: 0,
+            horasExtrasDiurnasTotales: 4.5,
+            horasExtrasNocturnasTotales: 1.0,
+            montoSalarioBaseProporcional: 3200000,
+            montoGananciaExtras: 120000,
+            montoDeduccionesFaltas: 0,
+            montoNetoPagar: 3320000,
+            estadoReporte: "PROCESADO_PAGO",
+            requiereRecalculo: false,
+            generadoEl: "2026-06-05T01:50:27.399Z"
+          }
+        ],
+        pageNumber: page,
+        pageSize: size,
+        totalElements: 1,
+        totalPages: 1
+      });
+    }, 450);
+  });
+};
+
+export const getMiContrato = async () => {
+  try {
+    const response = await api.get('/api/v1/empleado/panel/contrato');
+    return handleResponse(response);
+  } catch (error) {
+    if (!error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error')) {
+      return await mockGetMiContrato();
+    }
+    throw error;
+  }
+};
+
+export const getMisReportesPrenomina = async (params = {}) => {
+  try {
+    const response = await api.get('/api/v1/empleado/panel/reportes-prenomina', { params });
+    return handleResponse(response);
+  } catch (error) {
+    if (!error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error')) {
+      return await mockGetMisReportesPrenomina(params);
+    }
+    throw error;
+  }
+};
+

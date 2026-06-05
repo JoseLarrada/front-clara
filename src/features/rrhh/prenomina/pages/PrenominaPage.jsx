@@ -29,7 +29,9 @@ function PrenominaPage() {
     handlePageChange,
     handleCalculate,
     handleExport,
-    refetchHistory
+    refetchHistory,
+    recalculatingId,
+    handleRecalculateReport
   } = usePrenomina();
 
   // Determine whether to display a detailed single receipt or a consolidated table
@@ -138,6 +140,8 @@ function PrenominaPage() {
             loading={loadingHistory}
             onPageChange={handlePageChange}
             onExportReport={handleExportPastReport}
+            onRecalculateReport={handleRecalculateReport}
+            recalculatingId={recalculatingId}
           />
         </div>
 

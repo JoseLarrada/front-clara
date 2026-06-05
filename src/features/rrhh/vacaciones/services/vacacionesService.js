@@ -203,3 +203,19 @@ export const getSaldoVacaciones = async (empleadoId) => {
     throw error;
   }
 };
+
+export const registrarAjusteVacaciones = async (data) => {
+  try {
+    const response = await api.post('/api/v1/admin/vacaciones/ajustes', data);
+    return handleResponse(response);
+  } catch (error) {
+    if (!error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error')) {
+      const { empleadoId, cantidadDias } = data;
+      if (mockSaldos[empleadoId] !== undefined) {
+        mockSaldos[empleadoId] = Math.max(0, mockSaldos[empleadoId] + cantidadDias);
+      }
+      return { success: true, message: 'Ajuste de vacaciones registrado (Simulado)' };
+    }
+    throw error;
+  }
+};

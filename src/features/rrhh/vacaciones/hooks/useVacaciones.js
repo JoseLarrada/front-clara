@@ -217,6 +217,7 @@ export const useVacaciones = () => {
     handleCreateVacacion,
     openFormModal,
     closeFormModal,
-    refetch: fetchPending
+    refetch: fetchPending,
+    refetchBalance: fetchEmployeeBalance
   };
 };

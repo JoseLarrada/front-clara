@@ -1,11 +1,13 @@
-import { Clock, Download, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { Clock, Download, ChevronLeft, ChevronRight, FileText, AlertCircle, RefreshCw } from 'lucide-react';
 
 function HistoricalReportsList({
   reports,
   pagination,
   loading,
   onPageChange,
-  onExportReport
+  onExportReport,
+  onRecalculateReport,
+  recalculatingId
 }) {
   // Helper to format currency
   const formatCurrency = (value) => {
@@ -116,7 +118,14 @@ function HistoricalReportsList({
 
                   {/* Estado */}
                   <td className="px-6 py-4 text-center">
-                    {renderStatusBadge(rep.estadoReporte)}
+                    <div className="flex flex-col items-center gap-1 justify-center">
+                      {renderStatusBadge(rep.estadoReporte)}
+                      {(rep.requiereRecalculo || rep.requiere_recalculo) && (
+                        <span className="inline-flex items-center gap-0.5 rounded-full border border-rose-250 bg-rose-50 px-2 py-0.5 text-5xs font-black uppercase tracking-wider text-rose-700 animate-pulse">
+                          <AlertCircle className="h-2.5 w-2.5" /> Requiere Recálculo
+                        </span>
+                      )}
+                    </div>
                   </td>
 
                   {/* Generado el */}
@@ -127,6 +136,17 @@ function HistoricalReportsList({
                   {/* Acciones */}
                   <td className="px-6 py-4 text-right">
                     <div className="inline-flex items-center gap-2">
+                      {(rep.requiereRecalculo || rep.requiere_recalculo) && onRecalculateReport && (
+                        <button
+                          type="button"
+                          disabled={recalculatingId === rep.id}
+                          onClick={() => onRecalculateReport(rep)}
+                          className="p-1.5 rounded-lg border border-amber-200 text-amber-650 hover:text-amber-700 hover:border-amber-400 hover:bg-amber-50 transition cursor-pointer"
+                          title="Recalcular Pre-nómina"
+                        >
+                          <RefreshCw className={`h-4 w-4 ${recalculatingId === rep.id ? 'animate-spin' : ''}`} />
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => onExportReport('pdf', rep)}
