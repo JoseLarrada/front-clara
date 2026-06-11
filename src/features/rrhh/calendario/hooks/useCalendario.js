@@ -9,8 +9,8 @@ import {
 
 export const useCalendario = () => {
   const today = new Date();
-  const [currentYear, setCurrentYear] = useState(2026); // Usar año base del proyecto 2026
-  const [currentMonth, setCurrentMonth] = useState(5);  // Mayo (1-indexed)
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
 
   const [employees, setEmployees] = useState([]);
   const [selectedEmpleadoId, setSelectedEmpleadoId] = useState('');

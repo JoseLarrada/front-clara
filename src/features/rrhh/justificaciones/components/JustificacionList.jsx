@@ -1,4 +1,5 @@
 import { Check, X, FileText, ChevronLeft, ChevronRight, FileDown, Plus } from 'lucide-react';
+import { getDownloadUrl } from '../../../../services/mediaService';
 
 function JustificacionList({
   justificaciones,
@@ -8,6 +9,21 @@ function JustificacionList({
   onAddClick,
   onActionClick
 }) {
+  const handleVerSoporte = async (e, fileKey) => {
+    e.preventDefault();
+    if (!fileKey) return;
+    try {
+      const url = await getDownloadUrl(fileKey);
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        alert('No se pudo generar el enlace de visualización para este soporte.');
+      }
+    } catch (err) {
+      console.error('Error al abrir el soporte:', err);
+      alert('Error de red al abrir el soporte.');
+    }
+  };
   return (
     <div className="rounded-3xl border border-slate-150 bg-white shadow-sm overflow-hidden text-left font-semibold text-xs text-slate-700">
       
@@ -86,15 +102,14 @@ function JustificacionList({
                   {/* Soporte */}
                   <td className="px-6 py-4 text-center">
                     {just.urlComprobanteS3 ? (
-                      <a
-                        href={just.urlComprobanteS3}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 hover:border-[#1ba0f2]/40 hover:bg-[#1ba0f2]/5 px-3 py-1.5 text-3xs font-extrabold uppercase tracking-wide text-slate-600 hover:text-[#1ba0f2] transition cursor-pointer"
+                      <button
+                        type="button"
+                        onClick={(e) => handleVerSoporte(e, just.urlComprobanteS3)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 hover:border-[#1ba0f2]/40 hover:bg-[#1ba0f2]/5 px-3 py-1.5 text-3xs font-extrabold uppercase tracking-wide text-slate-600 hover:text-[#1ba0f2] transition cursor-pointer bg-white"
                       >
                         <FileDown className="h-3.5 w-3.5" />
                         Ver Soporte
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-4xs text-slate-400 font-bold uppercase">Sin adjunto</span>
                     )}

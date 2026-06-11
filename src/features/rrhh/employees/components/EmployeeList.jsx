@@ -1,7 +1,35 @@
+import { useState, useEffect } from 'react';
 import { 
   ArrowUpDown, ChevronLeft, ChevronRight, Edit3, Trash2, 
   User, CheckCircle, XCircle, Search, Plus, UserPlus, Briefcase
 } from 'lucide-react';
+import { useS3Url } from '../../../../services/mediaService';
+
+function EmployeeAvatar({ fotoPatronUrl, nombreCompleto }) {
+  const { url } = useS3Url(fotoPatronUrl);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [url]);
+
+  const isUrl = url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:'));
+
+  return (
+    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+      {isUrl && !hasError ? (
+        <img 
+          src={url} 
+          alt={nombreCompleto} 
+          className="h-full w-full rounded-full object-cover" 
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <User className="h-4.5 w-4.5" />
+      )}
+    </div>
+  );
+}
 
 function EmployeeList({
   employees,
@@ -123,18 +151,10 @@ function EmployeeList({
                   {/* Name / Email */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 border border-slate-200">
-                        {emp.fotoPatronUrl ? (
-                          <img 
-                            src={emp.fotoPatronUrl} 
-                            alt={emp.nombreCompleto} 
-                            className="h-full w-full rounded-full object-cover" 
-                            onError={(e) => { e.target.src = ''; e.target.onerror = null; }}
-                          />
-                        ) : (
-                          <User className="h-4.5 w-4.5" />
-                        )}
-                      </div>
+                      <EmployeeAvatar 
+                        fotoPatronUrl={emp.fotoPatronUrl} 
+                        nombreCompleto={emp.nombreCompleto} 
+                      />
                       <div className="text-left font-semibold">
                         <p className="text-sm font-extrabold text-[#0f2942] leading-none">{emp.nombreCompleto}</p>
                         <p className="text-3xs text-slate-450 mt-1 leading-none">{emp.email}</p>

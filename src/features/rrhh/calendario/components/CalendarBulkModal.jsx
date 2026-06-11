@@ -12,7 +12,7 @@ function CalendarBulkModal({
     fechaInicio: '',
     fechaFin: '',
     caracterDia: 'REMOTO',
-    repeticion: 'NINGUNA',
+    repeticion: 'SEMANAL',
     diasSemana: [1, 2, 3, 4, 5] // default Mon-Fri
   });
 
@@ -43,7 +43,7 @@ function CalendarBulkModal({
         fechaInicio: tomorrowStr,
         fechaFin: weekLaterStr,
         caracterDia: 'REMOTO',
-        repeticion: 'NINGUNA',
+        repeticion: 'SEMANAL',
         diasSemana: [1, 2, 3, 4, 5]
       });
       setLocalError('');
@@ -236,12 +236,12 @@ function CalendarBulkModal({
               disabled={actionLoading}
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-bold text-[#0f2942] focus:border-[#1ba0f2] focus:ring-1 focus:ring-[#1ba0f2] focus:outline-none transition cursor-pointer"
             >
-              <option value="NINGUNA">No repetir (Rango continuo)</option>
+              <option value="SEMANAL">Personalizado (Elegir días de la semana)</option>
+              <option value="CADA_DOS_SEMANAS">Cada 2 semanas (Días personalizados)</option>
+              <option value="NINGUNA">Rango continuo (Todos los días)</option>
               <option value="DIARIA">Diariamente (Todos los días)</option>
               <option value="LABORAL">Lunes a Viernes</option>
               <option value="FIN_SEMANA">Sábados y Domingos</option>
-              <option value="SEMANAL">Semanalmente...</option>
-              <option value="CADA_DOS_SEMANAS">Cada 2 semanas...</option>
             </select>
           </div>
 

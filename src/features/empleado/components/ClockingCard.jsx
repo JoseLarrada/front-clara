@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { empleadoService } from '../services/empleadoService';
+import { useAuthContext } from '../../../context/AuthContext';
 import { 
   Play, 
   Pause, 
@@ -36,6 +37,7 @@ const calcularDistancia = (lat1, lon1, lat2, lon2) => {
 };
 
 export default function ClockingCard({ panelData, geocercas = [], onRefresh }) {
+  const { user } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -291,22 +293,25 @@ export default function ClockingCard({ panelData, geocercas = [], onRefresh }) {
     setSuccess(null);
 
     try {
-      let request = {
-        tipoMarcacion: tipo,
-        origenMarcacion: origen,
-        tokenQr: origen === 'QR_DINAMICO' ? qrToken : null,
-        
-        // Atributos de seguridad remota
-        esFacialVerificado: origen === 'BOTON_REMOTO' ? (biometricScore >= 80) : null,
-        precisionGpsAccuracy: origen === 'BOTON_REMOTO' ? gpsAccuracy : null,
-        latitud: origen === 'BOTON_REMOTO' ? gpsCoords?.latitude : null,
-        longitud: origen === 'BOTON_REMOTO' ? gpsCoords?.longitude : null,
-        esMockLocation: origen === 'BOTON_REMOTO' ? gpsMocked : null,
-        fotoCapturaUrl: origen === 'BOTON_REMOTO' 
-          ? `https://bucket-s3.s3.amazonaws.com/asistencias/carles_perez_${tipo.toLowerCase()}_selfie.jpg` 
-          : null,
-        scoreFacialCoincidencia: origen === 'BOTON_REMOTO' ? biometricScore : null
-      };
+        const username = user?.sub ? user.sub.split('@')[0] : 'colaborador';
+        const cleanUsername = username.replace(/[^a-zA-Z0-9]/g, '_');
+
+        let request = {
+          tipoMarcacion: tipo,
+          origenMarcacion: origen,
+          tokenQr: origen === 'QR_DINAMICO' ? qrToken : null,
+          
+          // Atributos de seguridad remota
+          esFacialVerificado: origen === 'BOTON_REMOTO' ? (biometricScore >= 80) : null,
+          precisionGpsAccuracy: origen === 'BOTON_REMOTO' ? gpsAccuracy : null,
+          latitud: origen === 'BOTON_REMOTO' ? gpsCoords?.latitude : null,
+          longitud: origen === 'BOTON_REMOTO' ? gpsCoords?.longitude : null,
+          esMockLocation: origen === 'BOTON_REMOTO' ? gpsMocked : null,
+          fotoCapturaUrl: origen === 'BOTON_REMOTO' 
+            ? `asistencias/${cleanUsername}_${tipo.toLowerCase()}_selfie.jpg` 
+            : null,
+          scoreFacialCoincidencia: origen === 'BOTON_REMOTO' ? biometricScore : null
+        };
 
       const res = await empleadoService.registrarAsistencia(request);
       setSuccess(res.mensaje || '¡Asistencia registrada con éxito!');

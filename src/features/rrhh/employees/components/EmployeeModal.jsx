@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, User, Mail, Lock, Sparkles, ShieldAlert, Loader2, Image, Palmtree, Upload } from 'lucide-react';
-import { uploadFotoEmpleado } from '../../../../services/mediaService';
+import { uploadFotoEmpleado, useS3Url } from '../../../../services/mediaService';
 
 function EmployeeModal({ isOpen, onClose, onSubmit, activeEmployee, apiError, actionLoading }) {
   const [formData, setFormData] = useState({
@@ -13,6 +13,12 @@ function EmployeeModal({ isOpen, onClose, onSubmit, activeEmployee, apiError, ac
     saldoVacaciones: 15,
     activo: true
   });
+  
+  const { url: previewUrl } = useS3Url(formData.fotoPatronUrl);
+  const [previewError, setPreviewError] = useState(false);
+  useEffect(() => {
+    setPreviewError(false);
+  }, [previewUrl]);
   
   const [localError, setLocalError] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -73,7 +79,7 @@ function EmployeeModal({ isOpen, onClose, onSubmit, activeEmployee, apiError, ac
       const res = await uploadFotoEmpleado(file);
       setFormData(prev => ({
         ...prev,
-        fotoPatronUrl: res.url
+        fotoPatronUrl: res.fileKey || res.url || ''
       }));
     } catch (err) {
       console.error('Error uploading employee photo:', err);
@@ -336,10 +342,27 @@ function EmployeeModal({ isOpen, onClose, onSubmit, activeEmployee, apiError, ac
                 value={formData.fotoPatronUrl}
                 onChange={handleChange}
                 disabled={actionLoading}
-                placeholder="https://s3.amazonaws.com/buckets/carlos_patron.jpg"
+                placeholder="empleados/uuid.jpg"
                 className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-xs placeholder-slate-400 focus:border-[#1ba0f2] focus:ring-1 focus:ring-[#1ba0f2] focus:outline-none transition"
               />
             </div>
+            {formData.fotoPatronUrl && (
+              <div className="mt-2 flex items-center gap-3 bg-slate-50 border border-slate-200 p-2.5 rounded-xl">
+                <div className="h-10 w-10 rounded-full border border-slate-250 overflow-hidden flex items-center justify-center bg-white shrink-0">
+                  {previewUrl && (previewUrl.startsWith('http://') || previewUrl.startsWith('https://') || previewUrl.startsWith('blob:') || previewUrl.startsWith('data:')) && !previewError ? (
+                    <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" onError={() => setPreviewError(true)} />
+                  ) : (
+                    <User className="h-5 w-5 text-slate-400" />
+                  )}
+                </div>
+                <div className="overflow-hidden">
+                  <span className="block text-5xs font-bold text-slate-400 uppercase tracking-wider">S3 Key / Foto Patrón</span>
+                  <span className="block text-4xs font-mono truncate text-slate-650" title={formData.fotoPatronUrl}>
+                    {formData.fotoPatronUrl}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Footer Actions */}

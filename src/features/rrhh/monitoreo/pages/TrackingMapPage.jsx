@@ -196,6 +196,7 @@ export default function TrackingMapPage() {
         <AuditModal
           auditAnomaly={state.auditAnomaly}
           setAuditAnomaly={state.setAuditAnomaly}
+          employees={state.employees}
         />
 
         <ResolutionModal

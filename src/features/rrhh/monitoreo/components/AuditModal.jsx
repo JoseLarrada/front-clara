@@ -1,4 +1,5 @@
 import { ShieldAlert, X, User, Camera, ExternalLink } from 'lucide-react';
+import { useS3Url } from '../../../../services/mediaService';
 
 const getTipoAnomaliaLabel = (type) => {
   switch (type) {
@@ -9,8 +10,15 @@ const getTipoAnomaliaLabel = (type) => {
   }
 };
 
-export default function AuditModal({ auditAnomaly, setAuditAnomaly }) {
+export default function AuditModal({ auditAnomaly, setAuditAnomaly, employees = [] }) {
   if (!auditAnomaly) return null;
+
+  const employee = employees.find(e => e.empleadoId === auditAnomaly.empleadoId || e.id === auditAnomaly.empleadoId);
+  const fotoPatronKey = employee?.fotoPatronUrl;
+
+  const { url: patronUrl } = useS3Url(fotoPatronKey);
+  const selfieKey = auditAnomaly.fotoCapturaUrl || `asistencias/${auditAnomaly.empleadoId}_captura.jpg`;
+  const { url: selfieUrl } = useS3Url(selfieKey);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs text-left text-slate-850">
@@ -76,7 +84,11 @@ export default function AuditModal({ auditAnomaly, setAuditAnomaly }) {
                 <div className="text-center space-y-1.5">
                   <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Foto de Registro</span>
                   <div className="h-32 bg-slate-50 rounded-2xl overflow-hidden border border-slate-150 flex items-center justify-center relative">
-                    <User className="h-10 w-10 text-slate-350" />
+                    {patronUrl ? (
+                      <img src={patronUrl} alt="Registro oficial" className="h-full w-full object-cover" />
+                    ) : (
+                      <User className="h-10 w-10 text-slate-350" />
+                    )}
                     <div className="absolute bottom-2 inset-x-2 bg-[#0f2942]/70 backdrop-blur-xs py-0.5 rounded text-[8px] font-black uppercase text-white tracking-widest text-center">
                       PATRÓN OFICIAL
                     </div>
@@ -87,7 +99,11 @@ export default function AuditModal({ auditAnomaly, setAuditAnomaly }) {
                 <div className="text-center space-y-1.5">
                   <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Selfie Capturada</span>
                   <div className="h-32 bg-rose-50/50 rounded-2xl overflow-hidden border border-rose-250 flex items-center justify-center relative">
-                    <Camera className="h-10 w-10 text-rose-450" />
+                    {selfieUrl ? (
+                      <img src={selfieUrl} alt="Selfie Capturada" className="h-full w-full object-cover" />
+                    ) : (
+                      <Camera className="h-10 w-10 text-rose-450" />
+                    )}
                     <div className="absolute inset-0 bg-rose-500/10 flex items-center justify-center pointer-events-none">
                       <span className="bg-rose-600 text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm animate-pulse">
                         NO COINCIDE
@@ -135,15 +151,20 @@ export default function AuditModal({ auditAnomaly, setAuditAnomaly }) {
 
         {/* Botón de Cierre */}
         <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
-          <a
-            href={`https://bucket-s3.s3.amazonaws.com/asistencias/${auditAnomaly.empleadoId}_captura.jpg`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-2xs"
+          <button
+            type="button"
+            onClick={() => {
+              if (selfieUrl) {
+                window.open(selfieUrl, '_blank');
+              } else {
+                alert('No se pudo generar el enlace firmado de visualización.');
+              }
+            }}
+            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-2xs border-none cursor-pointer"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             <span>Ver Foto en S3</span>
-          </a>
+          </button>
           <button
             type="button"
             onClick={() => setAuditAnomaly(null)}

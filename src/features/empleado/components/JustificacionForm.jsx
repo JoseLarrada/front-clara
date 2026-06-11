@@ -37,8 +37,8 @@ export default function JustificacionForm({ panelData }) {
       // 1. Subir archivo a S3
       console.log('Subiendo evidencia a S3...', file.name);
       const uploadRes = await empleadoService.uploadJustificacionFile(file);
-      const urlComprobanteS3 = uploadRes.url;
-      console.log('Subido correctamente a S3, url:', urlComprobanteS3);
+      const urlComprobanteS3 = uploadRes.fileKey || uploadRes.url;
+      console.log('Subido correctamente a S3, key:', urlComprobanteS3);
 
       // 2. Obtener el registro de asistencia del panel
       // Si la jornada de hoy está iniciada o tiene tardanza

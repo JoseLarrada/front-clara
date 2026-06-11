@@ -67,7 +67,7 @@ function JustificacionFormModal({
       const res = await uploadJustificacion(file);
       setFormData(prev => ({
         ...prev,
-        urlComprobanteS3: res.url
+        urlComprobanteS3: res.fileKey || res.url || ''
       }));
     } catch (err) {
       console.error('Error uploading justification file:', err);
@@ -103,12 +103,6 @@ function JustificacionFormModal({
       return;
     }
     
-    // Simple URL validation
-    if (!formData.urlComprobanteS3.startsWith('http://') && !formData.urlComprobanteS3.startsWith('https://')) {
-      setLocalError('La URL del comprobante debe ser un enlace válido (iniciar con http:// o https://).');
-      return;
-    }
-
     onSubmit(formData);
   };
 
@@ -255,7 +249,7 @@ function JustificacionFormModal({
               value={formData.urlComprobanteS3}
               onChange={handleChange}
               disabled={actionLoading}
-              placeholder="https://s3.amazonaws.com/bucket/justificaciones/soporte.pdf"
+              placeholder="justificaciones/uuid.pdf"
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-mono focus:border-[#1ba0f2] focus:ring-1 focus:ring-[#1ba0f2] focus:outline-none transition"
             />
           </div>
